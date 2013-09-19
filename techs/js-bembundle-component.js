@@ -41,6 +41,7 @@ module.exports = require('../lib/build-flow').create()
     .useSourceListFilenames('jsChunksTargets', ['?.js-chunks.js'])
     .useSourceListFilenames('cssChunksTargets', ['?.css-chunks.js'])
     .target('target', '?.bembundle.js')
+    .defineOption('cryptoName', '_ycssjs')
     .builder(function(jsChunkFilenames, cssChunkFilenames) {
         var _this = this,
             jsChunks = [],
@@ -84,14 +85,14 @@ module.exports = require('../lib/build-flow').create()
     })
     .staticMethods({
         getOnceFunctionDecl: function() {
-            return '(function(){ this._ycssjs || ' +
-                '(this._ycssjs=function(a,b){return !(a in _ycssjs||_ycssjs[a]++)}) })();\n';
+            return '(function(){ this.' + this._cryptoName + ' || ' +
+                '(this.' + this._cryptoName + '=function(a,b){return !(a in ' + this._cryptoName + '||' + this._cryptoName + '[a]++)}) })();\n';
         },
         wrapWithOnceIf: function(data, filename, hash) {
-            return 'if (_ycssjs("' + hash + '")) {\n' + '// ' + filename + '\n' + data + '\n}';
+            return 'if (' + this._cryptoName + '("' + hash + '")) {\n' + '// ' + filename + '\n' + data + '\n}';
         },
         getExistingChunkDecl: function(hash) {
-            return '_ycssjs("' + hash + '");\n';
+            return this._cryptoName + '("' + hash + '");\n';
         }
     })
     .createTech();
